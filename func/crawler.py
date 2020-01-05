@@ -93,9 +93,9 @@ class Crawler:
         page = BeautifulSoup(res.content)
 
         if page:
-            pRoe_avg5yrs = page.find("td", text=re.compile('Return on Equity - 5 Yr\. Avg\.'))
-            pDy = page.find("td", text=re.compile('Dividend Yield'))
-            pDy_avg5yrs = page.find("td", text=re.compile('Dividend Yield - 5 Year Avg'))
+            pRoe_avg5yrs = page.find("th", text=re.compile('Return on Equity - 5 Yr\. Avg\.'))
+            pDy = page.find("th", text=re.compile('Dividend Yield'))
+            pDy_avg5yrs = page.find("th", text=re.compile('Dividend Yield - 5 Year Avg'))
 
             if not (pRoe_avg5yrs is None):
                 roe_avg5yrs = str(pRoe_avg5yrs.find_next_sibling("td").get_text()).replace(",", "")
