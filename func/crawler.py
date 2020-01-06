@@ -88,14 +88,17 @@ class Crawler:
         #########################################
         ##  Return On Equity & Dividend Yield  ##
         #########################################
+        if _stock_code == 'BBDC3':
+            pass
+                
         url = self.url_return_equity_dividend_yield.format(_stock_code)
         res = requests.get(url, headers=headers)
         page = BeautifulSoup(res.content)
 
         if page:
-            pRoe_avg5yrs = page.find("th", text=re.compile('Return on Equity - 5 Yr\. Avg\.'))
-            pDy = page.find("th", text=re.compile('Dividend Yield'))
-            pDy_avg5yrs = page.find("th", text=re.compile('Dividend Yield - 5 Year Avg'))
+            pRoe_avg5yrs = page.find("th", text=re.compile('^Return On Average Equity \(5Y\)$'))
+            pDy = page.find("th", text=re.compile('^Dividend Yield$'))
+            pDy_avg5yrs = page.find("th", text=re.compile('^Dividend Yield \(5Y\)$'))
 
             if not (pRoe_avg5yrs is None):
                 roe_avg5yrs = str(pRoe_avg5yrs.find_next_sibling("td").get_text()).replace(",", "")
@@ -115,6 +118,6 @@ class Crawler:
         comp_obj.Valuation = Parser.ParseOrdinalNumber(valuation)
         comp_obj.ReturnOnEquity_5yrAvg = float(roe_avg5yrs if roe_avg5yrs != "" and roe_avg5yrs != "--" and roe_avg5yrs != "-" else "0.00") / 100
         comp_obj.DividendYeld = float(dy if dy != "" and dy != "--" and dy != "-" else "0.00") / 100
-        comp_obj.DividendYeld_5yrAvg = float(float(dy_avg5yrs if dy_avg5yrs != "" and dy_avg5yrs != "--" and dy_avg5yrs != "-" else "0.00")) / 100
+        comp_obj.DividendYeld_5yrs = float(float(dy_avg5yrs if dy_avg5yrs != "" and dy_avg5yrs != "--" and dy_avg5yrs != "-" else "0.00")) / 100
 
         return comp_obj

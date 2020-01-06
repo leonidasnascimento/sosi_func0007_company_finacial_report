@@ -7,7 +7,7 @@ class Company(object):
     ReturnOnEquity_5yrAvg: 0.00
     PayoutRatio: 0.00
     DividendYeld: 0.00
-    DividendYeld_5yrAvg: 0.00
+    DividendYeld_5yrs: 0.00
     Valuation: 0.00   
     
     def __init__(self, _code):
