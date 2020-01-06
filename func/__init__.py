@@ -39,12 +39,12 @@ def main(mytimer: func.TimerRequest) -> None:
         for code in stk_codes:
             logging.info(code['stock'])
             
-            process_crawling(code['stock'], url_key_statistics, url_gross_debit_over_ebitida, url_return_equity_dividend_yield, post_service_url)
+            # process_crawling(code['stock'], url_key_statistics, url_gross_debit_over_ebitida, url_return_equity_dividend_yield, post_service_url)
 
-            # t_aux: threading.Thread = threading.Thread(target=process_crawling, args=(code['stock'], url_key_statistics, url_gross_debit_over_ebitida, url_return_equity_dividend_yield))            
-            # thread_lst.append(t_aux)
+            t_aux: threading.Thread = threading.Thread(target=process_crawling, args=(code['stock'], url_key_statistics, url_gross_debit_over_ebitida, url_return_equity_dividend_yield, post_service_url))            
+            thread_lst.append(t_aux)
         
-            # t_aux.start()
+            t_aux.start()
             pass
             
         # Wait 'till all threads are done
@@ -77,6 +77,9 @@ def process_crawling(stock_code: str, url_key_statistics: str, url_gross_debit_o
     pass
 
 def post_data(url, json):
+    if url == '':
+        return
+
     headers = {
         'content-type': "application/json",
         'cache-control': "no-cache",
