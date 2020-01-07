@@ -69,6 +69,8 @@ def process_crawling(stock_code: str, url_key_statistics: str, url_gross_debit_o
         if company_data:
             json_obj = json.dumps(company_data.__dict__, default=lambda o: o.__dict__)
 
+            post_data(post_service_url, json_obj)
+
             threading.Thread(target=post_data, args=(post_service_url, json_obj)).start()                
             pass
     except Exception as e:
@@ -76,10 +78,7 @@ def process_crawling(stock_code: str, url_key_statistics: str, url_gross_debit_o
         pass
     pass
 
-def post_data(url, json):
-    if url == '':
-        return
-
+def post_data(url, json):    
     headers = {
         'content-type': "application/json",
         'cache-control': "no-cache",

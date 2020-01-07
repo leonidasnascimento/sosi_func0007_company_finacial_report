@@ -107,18 +107,14 @@ class Crawler:
                 dy_avg5yrs = str(pDy_avg5yrs.find_next_sibling("td").get_text()).replace(",", "")
 
         # filling the properties
-        comp_obj.AvgVolume10Days = Parser.ParseOrdinalNumber(avg10DaysVolume)
-        comp_obj.AvgVolume3Months = Parser.ParseOrdinalNumber(avg3MonthsVolume)
-        comp_obj.ReturnOnEquity = Parser.ParseFloat(roe)
-        comp_obj.GrossDebitOverEbitida = Parser.ParseFloat(grossDebitEbitida) / 100 
-        comp_obj.PayoutRatio = Parser.ParseFloat(payoutRatio)
-        comp_obj.Valuation = Parser.ParseOrdinalNumber(valuation)
-        comp_obj.ReturnOnEquity_5yrAvg = float(roe_avg5yrs if roe_avg5yrs != "" and roe_avg5yrs != "--" and roe_avg5yrs != "-" else "0.00") / 100
-        comp_obj.DividendYeld = float(dy if dy != "" and dy != "--" and dy != "-" else "0.00") / 100
-        comp_obj.DividendYeld_5yrs = float(float(dy_avg5yrs if dy_avg5yrs != "" and dy_avg5yrs != "--" and dy_avg5yrs != "-" else "0.00")) / 100
-
-        if comp_obj.Code == "BBDC3":
-            comp_obj.Code = "BBDC3"
-            pass
+        comp_obj.avgVolume10Days = Parser.ParseOrdinalNumber(avg10DaysVolume)
+        comp_obj.avgVolume3Months = Parser.ParseOrdinalNumber(avg3MonthsVolume)
+        comp_obj.returnOnEquity = Parser.ParseFloat(roe)
+        comp_obj.grossDebitOverEbitida = Parser.ParseFloat(grossDebitEbitida) / 100 
+        comp_obj.payoutRatio = Parser.ParseFloat(payoutRatio)
+        comp_obj.valuation = Parser.ParseOrdinalNumber(valuation)
+        comp_obj.returnOnEquity_5yrAvg = float(roe_avg5yrs if roe_avg5yrs != "" and roe_avg5yrs != "--" and roe_avg5yrs != "-" else "0.00") / 100
+        comp_obj.dividendYeld = float(dy if dy != "" and dy != "--" and dy != "-" else "0.00") / 100
+        comp_obj.dividendYeld_5yrs = float(float(dy_avg5yrs if dy_avg5yrs != "" and dy_avg5yrs != "--" and dy_avg5yrs != "-" else "0.00")) / 100
 
         return comp_obj
