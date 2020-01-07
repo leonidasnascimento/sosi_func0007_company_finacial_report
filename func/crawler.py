@@ -115,6 +115,6 @@ class Crawler:
         comp_obj.valuation = Parser.ParseOrdinalNumber(valuation)
         comp_obj.returnOnEquity_5yrAvg = float(roe_avg5yrs if roe_avg5yrs != "" and roe_avg5yrs != "--" and roe_avg5yrs != "-" else "0.00") / 100
         comp_obj.dividendYeld = float(dy if dy != "" and dy != "--" and dy != "-" else "0.00") / 100
-        comp_obj.dividendYeld_5yrs = float(float(dy_avg5yrs if dy_avg5yrs != "" and dy_avg5yrs != "--" and dy_avg5yrs != "-" else "0.00")) / 100
+        comp_obj.dividendYeld_5yrs = float(dy_avg5yrs if dy_avg5yrs != "" and dy_avg5yrs != "--" and dy_avg5yrs != "-" else "0.00") / 100
 
         return comp_obj
