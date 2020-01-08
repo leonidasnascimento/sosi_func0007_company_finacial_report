@@ -10,6 +10,7 @@ import requests
 
 from .crawler import Crawler
 from .model.company import Company
+from .model.status_processing import StatusProcessing
 from typing import List
 from dateutil.relativedelta import relativedelta
 from configuration_manager.reader import reader
@@ -17,7 +18,7 @@ from configuration_manager.reader import reader
 SETTINGS_FILE_PATH = pathlib.Path(
     __file__).parent.parent.__str__() + "//local.settings.json"
 
-def main(mytimer: func.TimerRequest) -> None:
+def main(req: func.HttpRequest) -> func.HttpResponse:
     utc_timestamp = datetime.datetime.utcnow().replace(
         tzinfo=datetime.timezone.utc).isoformat()
 
@@ -25,57 +26,39 @@ def main(mytimer: func.TimerRequest) -> None:
         logging.info("Timer job 'sosi_func0007_company_statistics' has begun")
 
         config_obj: reader = reader(SETTINGS_FILE_PATH, 'Values')
-        stock_code_list_service_url: str = config_obj.get_value("stock_code_list_service_url")
         post_service_url: str = config_obj.get_value("post_service_url")
         url_key_statistics: str = config_obj.get_value("url_key_statistics")
         url_gross_debit_over_ebitida: str = config_obj.get_value("url_gross_debit_over_ebitida")
         url_return_equity_dividend_yield: str = config_obj.get_value("url_return_equity_dividend_yield")
         
-        # Getting stock code list
-        response = requests.request("GET", stock_code_list_service_url)
-        stk_codes = json.loads(response.text)
-        thread_lst: List[threading.Thread] = []
-        
-        for code in stk_codes:
-            logging.info(code['stock'])
+        # Messages
+        ERR_CODE_REQUIRED = "Stock code is required"
+        ERR_STOCK_NOT_PROCESSED = "{} was not processed"
+        SUCCESS_STOCK_PROCESSED = "{} processed"
+
+        if (not req) or len(req.params) == 0 or (not req.params.get("code")):
+            logging.error(ERR_CODE_REQUIRED)
+            return func.HttpResponse(body=json.dumps(StatusProcessing(False, ERR_CODE_REQUIRED).__dict__), status_code=204)
             
-            # process_crawling(code['stock'], url_key_statistics, url_gross_debit_over_ebitida, url_return_equity_dividend_yield, post_service_url)
+        stock_code: str = str(req.params.get("code"))
 
-            t_aux: threading.Thread = threading.Thread(target=process_crawling, args=(code['stock'], url_key_statistics, url_gross_debit_over_ebitida, url_return_equity_dividend_yield, post_service_url))            
-            thread_lst.append(t_aux)
-        
-            t_aux.start()
-            pass
-            
-        # Wait 'till all threads are done
-        for thread in thread_lst:
-            if thread and thread.is_alive():    
-                thread.join()
-
-        logging.info("Timer job is done. Waiting for the next execution time")
-
-        pass
-    except Exception as ex:
-        error_log = '{} -> {}'
-        logging.exception(error_log.format(utc_timestamp, str(ex)))
-        pass
-    pass
-
-def process_crawling(stock_code: str, url_key_statistics: str, url_gross_debit_over_ebitida: str, url_return_equity_dividend_yield: str, post_service_url: str):
-    try:
-        crawler_obj: Crawler = Crawler(url_key_statistics, url_gross_debit_over_ebitida, url_return_equity_dividend_yield)
+        crawler_obj: Crawler = Crawler(url_key_statistics, url_gross_debit_over_ebitida, url_return_equity_dividend_yield, utc_timestamp)
         company_data: Company = crawler_obj.get_data(stock_code)
 
         if company_data:
             json_obj = json.dumps(company_data.__dict__, default=lambda o: o.__dict__)
 
-            post_data(post_service_url, json_obj)
-
+            # TODO: At the time, we're not caring about the microservice response here 
             threading.Thread(target=post_data, args=(post_service_url, json_obj)).start()                
-            pass
-    except Exception as e:
-        logging.error(e)
+            return func.HttpResponse(body=json.dumps(StatusProcessing(True, SUCCESS_STOCK_PROCESSED.format(stock_code)).__dict__), status_code=200)
+        else:
+            logging.warn(ERR_STOCK_NOT_PROCESSED.format(stock_code))
+            return func.HttpResponse(body=json.dumps(StatusProcessing(False, ERR_STOCK_NOT_PROCESSED.format(stock_code)).__dict__), status_code=500)    
         pass
+    except Exception as ex:
+        error_log = '{} -> {}'.format(utc_timestamp, str(ex))
+        logging.exception(error_log)
+        return func.HttpResponse(body=json.dumps(StatusProcessing(False, error_log, ex).__dict__), status_code=500)
     pass
 
 def post_data(url, json):    

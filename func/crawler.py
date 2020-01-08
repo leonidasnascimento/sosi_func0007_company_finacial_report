@@ -13,15 +13,17 @@ class Crawler:
     url_key_statistics: str = ''
     url_gross_debit_over_ebitida: str = ''
     url_return_equity_dividend_yield: str
+    dt_processing: str = ''
 
-    def __init__(self, _url_key_statistics: str, _url_gross_debit_over_ebitida: str, _url_return_equity_dividend_yield: str):
+    def __init__(self, _url_key_statistics: str, _url_gross_debit_over_ebitida: str, _url_return_equity_dividend_yield: str, _dt_processing: str):
         self.url_key_statistics = _url_key_statistics
         self.url_gross_debit_over_ebitida = _url_gross_debit_over_ebitida
-        self.url_return_equity_dividend_yield = _url_return_equity_dividend_yield        
+        self.url_return_equity_dividend_yield = _url_return_equity_dividend_yield
+        self.dt_processing = _dt_processing        
         pass
 
     def get_data(self, _stock_code: str) -> Company:
-        comp_obj: Company = Company(_stock_code)
+        comp_obj: Company = Company(_stock_code, self.dt_processing)
         
         headers = {
             'upgrade-insecure-requests': "1",
